@@ -1,5 +1,6 @@
 package com.example.shareyourmeme
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,6 +19,10 @@ import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    //We need to share the image url , so taking it a separate var
+    var currentImageUrl: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -43,12 +48,12 @@ class MainActivity : AppCompatActivity() {
             Request.Method.GET, url, null,
 
             Response.Listener { response ->
-                val url = response.getString("url")
+                currentImageUrl = response.getString("url")
                 //We are using glide library to generate image from URL
                 //It takes two params
                 //1. Context of current file i.e. this
 
-                Glide.with(this).load(url).listener(object : RequestListener<Drawable>{
+                Glide.with(this).load(currentImageUrl).listener(object : RequestListener<Drawable>{
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
@@ -82,7 +87,21 @@ class MainActivity : AppCompatActivity() {
         queue.add(jsonObjectRequest )
     }
 
-    fun shareMeme(view: View) {}
+    fun shareMeme(view: View) {
+
+        val intent = Intent(Intent.ACTION_SEND)
+        //Giving the type of thing which we want to share
+        intent.type = "text/plain"
+        //We are giving a extra text to the intent
+        intent.putExtra(Intent.EXTRA_TEXT,"Hey checkout this meme $currentImageUrl")
+        // Creating the chooser which will show which app to use for sharing
+        val chooser = Intent.createChooser(intent,"Share this meme using.. ")
+        startActivity(chooser)
+
+    }
+
+
+
     fun nextMeme(view: View) {
         loadMeme()
     }
