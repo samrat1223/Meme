@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
         // Instantiate the RequestQueue.
         //Making progress bar visible
         progressBar.visibility = View.VISIBLE
-        val queue = Volley.newRequestQueue(this)
         val url = "https://meme-api.herokuapp.com/gimme"
 
         // Request a string response from the provided URL.
@@ -84,7 +83,8 @@ class MainActivity : AppCompatActivity() {
             })
 
         // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest )
+        //Using Singleton method
+        MySingleton(this).addToRequestQueue(jsonObjectRequest)
     }
 
     fun shareMeme(view: View) {
