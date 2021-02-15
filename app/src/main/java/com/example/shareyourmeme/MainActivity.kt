@@ -1,5 +1,6 @@
 package com.example.shareyourmeme
 
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -10,6 +11,10 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         // From android developers blog
         // Instantiate the RequestQueue.
+        //Making progress bar visible
+        progressBar.visibility = View.VISIBLE
         val queue = Volley.newRequestQueue(this)
         val url = "https://meme-api.herokuapp.com/gimme"
 
@@ -41,7 +48,31 @@ class MainActivity : AppCompatActivity() {
                 //It takes two params
                 //1. Context of current file i.e. this
 
-                Glide.with(this).load(url).into(memeImageView)
+                Glide.with(this).load(url).listener(object : RequestListener<Drawable>{
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                            progressBar.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        progressBar.visibility = View.GONE
+                        return false
+                    }
+                }).into(memeImageView)
+                //Creating a handler method which will hide the progress bar when glide would have been downloaded the image
+
+
                               },
             Response.ErrorListener {
                 Toast.makeText(this,"Something Went wrong" ,Toast.LENGTH_LONG).show()
@@ -52,5 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun shareMeme(view: View) {}
-    fun nextMeme(view: View) {}
+    fun nextMeme(view: View) {
+        loadMeme()
+    }
 }
